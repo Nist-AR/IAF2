@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Art Map of India</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Google Fonts for typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --accent-gold: #e5a93c;
+      --text-light: #f0f0f0;
+      --text-muted: #a0a0a0;
+      --border-color: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header Styling */
+    header {
+      padding: 15px 25px;
+      background-color: var(--card-bg);
+      border-bottom: 2px solid var(--accent-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      color: var(--accent-gold);
+      letter-spacing: 1px;
+    }
+
+    /* Filter Bar */
+    .filter-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent-gold);
+      color: var(--bg-dark);
+      font-weight: 600;
+    }
+
+    /* Main Container layout */
+    .main-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+    }
+
+    /* Map Styling */
+    #map {
+      flex: 1;
+      height: 100%;
+      background: #0d0d0d;
+    }
+
+    /* Custom Leaflet Marker Styling */
+    .custom-art-icon {
+      background-color: var(--accent-gold);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      color: #121212;
+      text-align: center;
+      line-height: 32px;
+      font-size: 16px;
+      box-shadow: 0 0 10px rgba(229, 169, 60, 0.6);
+      transition: transform 0.2s ease;
+    }
+
+    .custom-art-icon:hover {
+      transform: scale(1.2);
+    }
+
+    /* Side Detail Panel Styling */
+    #side-panel {
+      width: 380px;
+      background-color: var(--card-bg);
+      border-left: 1px solid var(--border-color);
+      padding: 25px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    }
+
+    .panel-placeholder {
+      text-align: center;
+      color: var(--text-muted);
+      margin-top: 50%;
+      font-size: 0.95rem;
+    }
+
+    .art-badge {
+      align-self: flex-start;
+      background: rgba(229, 169, 60, 0.15);
+      color: var(--accent-gold);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .art-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: var(--accent-gold);
+    }
+
+    .art-location {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: -8px;
+    }
+
+    .art-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .art-description {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-light);
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+      margin-top: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 4px;
+    }
+
+    /* Responsive Design for smaller screens */
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      #side-panel {
+        width: 100%;
+        height: 40%;
+      }
+      header {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header & Era Filters -->
+  <header>
+    <h1>Indian Art History Map</h1>
+    <div class="filter-container">
+      <button class="filter-btn active" onclick="filterArt('all', this)">All Eras</button>
+      <button class="filter-btn" onclick="filterArt('prehistoric', this)">Prehistoric</button>
+      <button class="filter-btn" onclick="filterArt('ancient', this)">Ancient</button>
+      <button class="filter-btn" onclick="filterArt('medieval', this)">Medieval</button>
+      <button class="filter-btn" onclick="filterArt('modern', this)">Modern</button>
+    </div>
+  </header>
+
+  <!-- Main Section: Map + Details Panel -->
+  <div class="main-container">
+    <div id="map"></div>
+    
+    <div id="side-panel">
+      <div class="panel-placeholder" id="placeholder-text">
+        👈 Select any location pin on the map to explore its rich art heritage.
+      </div>
+      <div id="art-details" style="display: none;">
+        <span class="art-badge" id="art-era">Era</span>
+        <h2 class="art-title" id="art-title">Art Title</h2>
+        <p class="art-location" id="art-location">Location, State</p>
+        <img src="" alt="Artpiece" class="art-image" id="art-image">
+        
+        <div class="section-title">Overview</div>
+        <p class="art-description" id="art-desc">Description text goes here.</p>
+        
+        <div class="section-title">Key Artwork & Artists</div>
+        <p class="art-description" id="art-highlights">Highlights go here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // 1. Initialize Leaflet Map centered on India
+    const map = L.map('map', {
+      center: [22.5937, 78.9629],
+      zoom: 5,
+      zoomControl: true
+    });
+
+    // 2. Add Dark Mode Map Tiles (CartoDB Dark Matter tile layer)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    // 3. Indian Art Locations Data Set
+    const artLocations = [
+      {
+        id: 1,
+        title: "Bhimbetka Cave Paintings",
+        location: "Raisen, Madhya Pradesh",
+        era: "prehistoric",
+        eraLabel: "Prehistoric (c. 10,000 BCE)",
+        coords: [22.9378, 77.6133],
+        image: "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80",
+        description: "Bhimbetka displays the earliest traces of human life and artistic expression in India. The rock shelters showcase vivid depictions of hunting, dancing, animals, and communal rituals painted with natural pigments.",
+        highlights: "Zoo Rock Murals, Ochre and white mineral pigment paintings."
+      },
+      {
+        id: 2,
+        title: "Ajanta Cave Murals",
+        location: "Aurangabad, Maharashtra",
+        era: "ancient",
+        eraLabel: "Ancient (2nd C. BCE – 5th C. CE)",
+        coords: [20.5519, 75.7033],
+        image: "https://images.unsplash.com/photo-1609137144813-7d9921338f24?auto=format&fit=crop&w=600&q=80",
+        description: "The rock-cut Ajanta Caves contain masterpieces of ancient Buddhist mural paintings. Known for refined expressions, expressive gestures, and rhythmic line control, they depict scenes from the Jataka tales.",
+        highlights: "Padmapani and Vajrapani Bodhisattvas (Cave 1)."
+      },
+      {
+        id: 3,
+        title: "Tanjore Gold Paintings",
+        location: "Thanjavur, Tamil Nadu",
+        era: "medieval",
+        eraLabel: "Medieval (16th Century CE)",
+        coords: [10.7870, 79.1378],
+        image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=600&q=80",
+        description: "Originating under the Nayak patrons, Tanjore (Thanjavur) painting is characterized by dense compositions, rich colors, embedded semi-precious glass stones, and signature 22-karat gold leaf foil work.",
+        highlights: "Balakrishna iconography, glass and wooden panel gilding."
+      },
+      {
+        id: 4,
+        title: "Kangra Miniatures",
+        location: "Kangra, Himachal Pradesh",
+        era: "medieval",
+        eraLabel: "Medieval (18th Century CE)",
+        coords: [32.0998, 76.2691],
+        image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
+        description: "A major school of Pahari miniature painting, Kangra art is renowned for its delicate lines, poetic landscapes, soft color palettes, and romantic themes inspired by Jayadeva’s Gita Govinda.",
+        highlights: "Gita Govinda series, court patronage of Raja Sansar Chand."
+      },
+      {
+        id: 5,
+        title: "Santiniketan & Bengal School",
+        location: "Birbhum, West Bengal",
+        era: "modern",
+        eraLabel: "Modern (20th Century CE)",
+        coords: [23.6778, 87.6837],
+        image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80",
+        description: "Santiniketan served as the epicenter of the Bengal School of Art movement, modernizing Indian art by rejecting Western academic realism in favor of indigenous techniques and Asian aesthetics.",
+        highlights: "Abanindranath Tagore, Nandalal Bose, Rabindranath Tagore."
+      }
+    ];
+
+    // Store marker instances to manage filtering
+    const markerStore = [];
+
+    // Custom Icon Definition (HTML Icon with Font/Styling)
+    const createCustomIcon = () => {
+      return L.divIcon({
+        className: 'custom-art-icon',
+        html: '🎨',
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+        popupAnchor: [0, -15]
+      });
+    };
+
+    // 4. Render Markers on Map
+    artLocations.forEach(location => {
+      const marker = L.marker(location.coords, { icon: createCustomIcon() }).addTo(map);
+
+      // Add simple popup tooltip on hover/click
+      marker.bindPopup(`<b>${location.title}</b><br><small>${location.location}</small>`);
+
+      // Event: Update Side Panel when marker is clicked
+      marker.on('click', () => {
+        showDetails(location);
+        map.flyTo(location.coords, 7, { duration: 1.2 });
+      });
+
+      // Save reference for filter actions
+      markerStore.push({
+        era: location.era,
+        instance: marker
+      });
+    });
+
+    // 5. Update Sidebar Panel with Location Information
+    function showDetails(data) {
+      document.getElementById('placeholder-text').style.display = 'none';
+      const detailsContainer = document.getElementById('art-details');
+      detailsContainer.style.display = 'flex';
+      detailsContainer.style.flexDirection = 'column';
+
+      document.getElementById('art-era').innerText = data.eraLabel;
+      document.getElementById('art-title').innerText = data.title;
+      document.getElementById('art-location').innerText = data.location;
+      document.getElementById('art-image').src = data.image;
+      document.getElementById('art-desc').innerText = data.description;
+      document.getElementById('art-highlights').innerText = data.highlights;
+    }
+
+    // 6. Interactive Era Filter Handler
+    function filterArt(selectedEra, buttonElement) {
+      // Toggle active state on buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      buttonElement.classList.add('active');
+
+      // Show/Hide map markers according to era category
+      markerStore.forEach(item => {
+        if (selectedEra === 'all' || item.era === selectedEra) {
+          map.addLayer(item.instance);
+        } else {
+          map.removeLayer(item.instance);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
