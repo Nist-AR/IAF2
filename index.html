@@ -239,76 +239,80 @@
       zoomControl: true
     });
 
-    // 2. Add Dark Mode Map Tiles (CartoDB Dark Matter tile layer)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: 'abcd',
+    // Clean, free OpenStreetMap tiles layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19
     }).addTo(map);
 
-    // 3. Indian Art Locations Data Set
+    // 3. Indian Art Locations Data Set with local paths and online fallbacks
     const artLocations = [
-  {
-    id: 1,
-    title: "Bhimbetka Cave Paintings",
-    location: "Raisen, Madhya Pradesh",
-    era: "prehistoric",
-    eraLabel: "Prehistoric (c. 10,000 BCE)",
-    coords: [22.9378, 77.6133],
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Bhimbetka_rock_paintings_1.jpg/800px-Bhimbetka_rock_paintings_1.jpg",
-    description: "Bhimbetka displays the earliest traces of human life and artistic expression in India. The rock shelters showcase vivid depictions of hunting, dancing, animals, and communal rituals painted with natural mineral pigments.",
-    highlights: "Zoo Rock Murals, Ochre and white mineral pigment paintings."
-  },
-  {
-    id: 2,
-    title: "Ajanta Cave Murals",
-    location: "Aurangabad, Maharashtra",
-    era: "ancient",
-    eraLabel: "Ancient (2nd C. BCE – 5th C. CE)",
-    coords: [20.5519, 75.7033],
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ajanta_Cave_1_Padmapani.jpg/800px-Ajanta_Cave_1_Padmapani.jpg",
-    description: "The rock-cut Ajanta Caves contain masterpieces of ancient Buddhist mural paintings. Known for refined expressions, expressive gestures, and rhythmic line control, they depict scenes from the Jataka tales.",
-    highlights: "Padmapani Bodhisattva mural (Cave 1)."
-  },
-  {
-    id: 3,
-    title: "Tanjore Gold Paintings",
-    location: "Thanjavur, Tamil Nadu",
-    era: "medieval",
-    eraLabel: "Medieval (16th Century CE)",
-    coords: [10.7870, 79.1378],
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Tanjore_Painting_of_Krishna.jpg/800px-Tanjore_Painting_of_Krishna.jpg",
-    description: "Originating under the Nayak patrons, Tanjore (Thanjavur) painting is characterized by dense compositions, rich colors, embedded semi-precious glass stones, and signature 22-karat gold leaf foil work.",
-    highlights: "Balakrishna iconography, gold leaf and wooden panel gilding."
-  },
-  {
-    id: 4,
-    title: "Kangra Miniatures",
-    location: "Kangra, Himachal Pradesh",
-    era: "medieval",
-    eraLabel: "Medieval (18th Century CE)",
-    coords: [32.0998, 76.2691],
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Radha_and_Krishna_in_a_Landscape%2C_Kangra%2C_c._1790.jpg/800px-Radha_and_Krishna_in_a_Landscape%2C_Kangra%2C_c._1790.jpg",
-    description: "A major school of Pahari miniature painting, Kangra art is renowned for its delicate lines, poetic landscapes, soft color palettes, and romantic themes inspired by Jayadeva’s Gita Govinda.",
-    highlights: "Radha and Krishna series, court patronage of Raja Sansar Chand."
-  },
-  {
-    id: 5,
-    title: "Santiniketan & Bengal School",
-    location: "Birbhum, West Bengal",
-    era: "modern",
-    eraLabel: "Modern (20th Century CE)",
-    coords: [23.6778, 87.6837],
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Bharat_Mata_by_Abanindranath_Tagore.jpg/800px-Bharat_Mata_by_Abanindranath_Tagore.jpg",
-    description: "Santiniketan served as the epicenter of the Bengal School of Art movement, modernizing Indian art by rejecting Western academic realism in favor of indigenous techniques and Asian aesthetics.",
-    highlights: "Bharat Mata painting by Abanindranath Tagore, Nandalal Bose."
-  }
-];
+      {
+        id: 1,
+        title: "Bhimbetka Cave Paintings",
+        location: "Raisen, Madhya Pradesh",
+        era: "prehistoric",
+        eraLabel: "Prehistoric (c. 10,000 BCE)",
+        coords: [22.9378, 77.6133],
+        image: "./images/bhimbetka.jpg",
+        fallbackImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Bhimbetka_rock_paintings_1.jpg/800px-Bhimbetka_rock_paintings_1.jpg",
+        description: "Bhimbetka displays the earliest traces of human life and artistic expression in India. The rock shelters showcase vivid depictions of hunting, dancing, animals, and communal rituals painted with natural mineral pigments.",
+        highlights: "Zoo Rock Murals, Ochre and white mineral pigment paintings."
+      },
+      {
+        id: 2,
+        title: "Ajanta Cave Murals",
+        location: "Aurangabad, Maharashtra",
+        era: "ancient",
+        eraLabel: "Ancient (2nd C. BCE – 5th C. CE)",
+        coords: [20.5519, 75.7033],
+        image: "./images/ajanta.jpg",
+        fallbackImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ajanta_Cave_1_Padmapani.jpg/800px-Ajanta_Cave_1_Padmapani.jpg",
+        description: "The rock-cut Ajanta Caves contain masterpieces of ancient Buddhist mural paintings. Known for refined expressions, expressive gestures, and rhythmic line control, they depict scenes from the Jataka tales.",
+        highlights: "Padmapani Bodhisattva mural (Cave 1)."
+      },
+      {
+        id: 3,
+        title: "Tanjore Gold Paintings",
+        location: "Thanjavur, Tamil Nadu",
+        era: "medieval",
+        eraLabel: "Medieval (16th Century CE)",
+        coords: [10.7870, 79.1378],
+        image: "./images/tanjore.jpg",
+        fallbackImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Tanjore_Painting_of_Krishna.jpg/800px-Tanjore_Painting_of_Krishna.jpg",
+        description: "Originating under the Nayak patrons, Tanjore (Thanjavur) painting is characterized by dense compositions, rich colors, embedded semi-precious glass stones, and signature 22-karat gold leaf foil work.",
+        highlights: "Balakrishna iconography, gold leaf and wooden panel gilding."
+      },
+      {
+        id: 4,
+        title: "Kangra Miniatures",
+        location: "Kangra, Himachal Pradesh",
+        era: "medieval",
+        eraLabel: "Medieval (18th Century CE)",
+        coords: [32.0998, 76.2691],
+        image: "./images/kangra.jpg",
+        fallbackImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Radha_and_Krishna_in_a_Landscape%2C_Kangra%2C_c._1790.jpg/800px-Radha_and_Krishna_in_a_Landscape%2C_Kangra%2C_c._1790.jpg",
+        description: "A major school of Pahari miniature painting, Kangra art is renowned for its delicate lines, poetic landscapes, soft color palettes, and romantic themes inspired by Jayadeva’s Gita Govinda.",
+        highlights: "Radha and Krishna series, court patronage of Raja Sansar Chand."
+      },
+      {
+        id: 5,
+        title: "Santiniketan & Bengal School",
+        location: "Birbhum, West Bengal",
+        era: "modern",
+        eraLabel: "Modern (20th Century CE)",
+        coords: [23.6778, 87.6837],
+        image: "./images/santiniketan.jpg",
+        fallbackImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Bharat_Mata_by_Abanindranath_Tagore.jpg/800px-Bharat_Mata_by_Abanindranath_Tagore.jpg",
+        description: "Santiniketan served as the epicenter of the Bengal School of Art movement, modernizing Indian art by rejecting Western academic realism in favor of indigenous techniques and Asian aesthetics.",
+        highlights: "Bharat Mata painting by Abanindranath Tagore, Nandalal Bose."
+      }
+    ];
 
     // Store marker instances to manage filtering
     const markerStore = [];
 
-    // Custom Icon Definition (HTML Icon with Font/Styling)
+    // Custom Icon Definition
     const createCustomIcon = () => {
       return L.divIcon({
         className: 'custom-art-icon',
@@ -323,7 +327,7 @@
     artLocations.forEach(location => {
       const marker = L.marker(location.coords, { icon: createCustomIcon() }).addTo(map);
 
-      // Add simple popup tooltip on hover/click
+      // Add simple popup tooltip on click
       marker.bindPopup(`<b>${location.title}</b><br><small>${location.location}</small>`);
 
       // Event: Update Side Panel when marker is clicked
@@ -349,7 +353,13 @@
       document.getElementById('art-era').innerText = data.eraLabel;
       document.getElementById('art-title').innerText = data.title;
       document.getElementById('art-location').innerText = data.location;
-      document.getElementById('art-image').src = data.image;
+      
+      const imgElement = document.getElementById('art-image');
+      imgElement.onerror = function() {
+        this.src = data.fallbackImage; // Loads fallback image if local file fails
+      };
+      imgElement.src = data.image;
+
       document.getElementById('art-desc').innerText = data.description;
       document.getElementById('art-highlights').innerText = data.highlights;
     }
